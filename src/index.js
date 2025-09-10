@@ -18,23 +18,11 @@ const app = express();
 app.use(cookieParser());
 app.use(express.json());
 
-// ✅ CORS setup for Vercel previews, production, and localhost
+// ✅ CORS setup: allow all origins
 app.use(
     cors({
-        origin: (origin, callback) => {
-            // allow requests with no origin (curl, Postman)
-            if (!origin) return callback(null, true);
-
-            // allow localhost for development
-            if (origin.includes("localhost")) return callback(null, true);
-
-            // allow any Vercel frontend URL
-            if (/\.vercel\.app$/.test(origin)) return callback(null, true);
-
-            // block others
-            return callback(null, false);
-        },
-        credentials: true, // allow cookies
+        origin: true,       // allow any origin
+        credentials: true,  // allow cookies
     })
 );
 
