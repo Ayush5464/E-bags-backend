@@ -8,8 +8,9 @@ userRouter.post("/signup", userSignup)
 userRouter.post("/login", userLogin)
 userRouter.post("/logout", logoutUser)
 userRouter.get("/me", protect, (req, res) => {
-    res.status(200).json({ user: req.user });
-})
+    res.status(200).json(req.user);
+});
+
 
 
 export default userRouter
