@@ -17,10 +17,25 @@ const app = express();
 app.use(cookieParser());
 app.use(express.json());
 
-// CORS setup for Vercel frontend
+// ✅ Updated CORS to allow all vercel.app subdomains + localhost (optional)
 app.use(
     cors({
-        origin: "https://e-bags-frontend.vercel.app",
+        origin: (origin, callback) => {
+            const allowedOrigins = [
+                "https://e-bags-frontend.vercel.app",
+                "http://localhost:5173", // ← Optional: allow localhost for dev
+            ];
+
+            if (
+                !origin || // allow mobile apps, curl, etc.
+                allowedOrigins.includes(origin) ||
+                /\.vercel\.app$/.test(origin) // allow any *.vercel.app preview domain
+            ) {
+                callback(null, true);
+            } else {
+                callback(new Error("Not allowed by CORS: " + origin));
+            }
+        },
         credentials: true,
     })
 );
