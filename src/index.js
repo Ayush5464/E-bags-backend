@@ -18,16 +18,10 @@ const app = express();
 app.use(cookieParser());
 app.use(express.json());
 
-// CORS setup for Vercel frontends, localhost, Postman
 app.use(
     cors({
-        origin: (origin, callback) => {
-            if (!origin) return callback(null, true); // Postman/curl
-            if (/localhost/.test(origin)) return callback(null, true); // local dev
-            if (/\.vercel\.app$/.test(origin)) return callback(null, true); // any Vercel frontend
-            callback(null, false);
-        },
-        credentials: true, // crucial for cookies
+        origin: "https://e-bags-frontend.vercel.app", // Allow your frontend domain
+        credentials: true, // Allow cookies
     })
 );
 
@@ -36,6 +30,8 @@ const uploadsPath = path.join(path.resolve(), "uploads");
 if (!fs.existsSync(uploadsPath)) {
     fs.mkdirSync(uploadsPath, { recursive: true });
 }
+
+// Serve static uploads
 app.use("/uploads", express.static(uploadsPath));
 
 // Routes
@@ -45,12 +41,17 @@ app.use("/ebagmart/orders", orderRouter);
 app.use("/ebagmart/cart", cartRouter);
 app.use("/ebagmart/admin", adminRouter);
 
+// Optional GET route for auth testing
+app.get("/ebagmart/auth", (req, res) => {
+    res.send("Auth route is working! Use POST /login or /register");
+});
+
 // Default route
 app.get("/", (req, res) => {
     res.send("Backend is running!");
 });
 
-// Start server
+// Connect to DB and start server
 const PORT = process.env.PORT || 5000;
 ConnectDB()
     .then(() => {
@@ -58,4 +59,6 @@ ConnectDB()
             console.log(`Server running on port ${PORT}`);
         });
     })
-    .catch((err) => console.error("DB connection failed:", err));
+    .catch((err) => {
+        console.error("DB connection failed:", err);
+    });
