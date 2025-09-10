@@ -4,11 +4,12 @@ import dotenv from "dotenv";
 dotenv.config();
 import ConnectDB from "./config/db.js";
 import userRouter from "./routes/userRoutes.js";
-import productRoute from "./routes/productRouter.js";
+import productRouter from "./routes/productRouter.js";
 import orderRouter from "./routes/orderRouter.js";
 import cartRouter from "./routes/cartRouter.js";
 import adminRouter from "./routes/adminRouter.js";
 import cookieParser from "cookie-parser";
+import path from "path";
 
 const app = express();
 
@@ -25,14 +26,19 @@ app.use(
 );
 
 // Serve static uploads
-app.use("/uploads", express.static("uploads"));
+app.use("/uploads", express.static(path.join(path.resolve(), "uploads")));
 
 // Routes
 app.use("/ebagmart/auth", userRouter);
-app.use("/ebagmart/products", productRoute);
+app.use("/ebagmart/products", productRouter);
 app.use("/ebagmart/orders", orderRouter);
 app.use("/ebagmart/cart", cartRouter);
 app.use("/ebagmart/admin", adminRouter);
+
+// Optional GET route for auth testing
+app.get("/ebagmart/auth", (req, res) => {
+    res.send("Auth route is working! Use POST /login or /register");
+});
 
 // Default route
 app.get("/", (req, res) => {
