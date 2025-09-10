@@ -19,7 +19,7 @@ app.use(express.json());
 // CORS setup for Vercel frontend
 app.use(
     cors({
-        origin: process.env.FRONTEND_URL || "http://localhost:5173",
+        origin: "https://e-bags-frontend.vercel.app",
         credentials: true,
     })
 );
