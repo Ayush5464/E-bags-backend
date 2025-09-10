@@ -10,6 +10,7 @@ import cartRouter from "./routes/cartRouter.js";
 import adminRouter from "./routes/adminRouter.js";
 import cookieParser from "cookie-parser";
 import path from "path";
+import fs from "fs";
 
 const app = express();
 
@@ -17,31 +18,34 @@ const app = express();
 app.use(cookieParser());
 app.use(express.json());
 
-// ✅ Updated CORS to allow all vercel.app subdomains + localhost (optional)
+// ✅ CORS setup for Vercel previews, production, and localhost
 app.use(
     cors({
         origin: (origin, callback) => {
-            const allowedOrigins = [
-                "https://e-bags-frontend.vercel.app",
-                "http://localhost:5173", // ← Optional: allow localhost for dev
-            ];
+            // allow requests with no origin (curl, Postman)
+            if (!origin) return callback(null, true);
 
-            if (
-                !origin || // allow mobile apps, curl, etc.
-                allowedOrigins.includes(origin) ||
-                /\.vercel\.app$/.test(origin) // allow any *.vercel.app preview domain
-            ) {
-                callback(null, true);
-            } else {
-                callback(new Error("Not allowed by CORS: " + origin));
-            }
+            // allow localhost for development
+            if (origin.includes("localhost")) return callback(null, true);
+
+            // allow any Vercel frontend URL
+            if (/\.vercel\.app$/.test(origin)) return callback(null, true);
+
+            // block others
+            return callback(null, false);
         },
-        credentials: true,
+        credentials: true, // allow cookies
     })
 );
 
+// ✅ Ensure uploads folder exists
+const uploadsPath = path.join(path.resolve(), "uploads");
+if (!fs.existsSync(uploadsPath)) {
+    fs.mkdirSync(uploadsPath, { recursive: true });
+}
+
 // Serve static uploads
-app.use("/uploads", express.static(path.join(path.resolve(), "uploads")));
+app.use("/uploads", express.static(uploadsPath));
 
 // Routes
 app.use("/ebagmart/auth", userRouter);
