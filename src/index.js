@@ -23,6 +23,11 @@ app.use(cors(
 
 app.use("/uploads", express.static("uploads"));
 
+app.get("/", (req, res) => {
+    res.send("Backend is running!");
+});
+
+
 app.use("/ebagmart/auth", userRouter)
 app.use("/ebagmart/products", productRoute)
 app.use("/ebagmart/orders", orderRouter)
