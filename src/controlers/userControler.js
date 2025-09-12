@@ -1,24 +1,30 @@
+// controllers/userController.js
+
 import user from "../models/userModel.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
+// Register User
 export const userSignup = async (req, res) => {
     try {
         const { name, email, password } = req.body;
 
         const existing = await user.findOne({ email });
-        if (existing) return res.status(400).json({ message: "User already exists" });
+        if (existing) {
+            return res.status(400).json({ message: "User already exists" });
+        }
 
         const hashPassword = await bcrypt.hash(password, 10);
         await user.create({ name, email, password: hashPassword });
 
         res.status(201).json({ message: "User signed up successfully" });
     } catch (err) {
-        console.log(err);
+        console.error(err);
         res.status(500).json({ message: "Internal server error" });
     }
 };
 
+// Login User
 export const userLogin = async (req, res) => {
     const { email, password } = req.body;
 
@@ -37,24 +43,20 @@ export const userLogin = async (req, res) => {
         { expiresIn: "7d" }
     );
 
-    res.cookie("token", token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-        maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
-
+    // ✅ No need to set cookie — frontend uses localStorage
     res.status(200).json({
         token,
-        user: { id: User._id, name: User.name, email: User.email, isAdmin: User.isAdmin },
+        user: {
+            id: User._id,
+            name: User.name,
+            email: User.email,
+            isAdmin: User.isAdmin,
+        },
     });
 };
 
+// Logout User
 export const logoutUser = (req, res) => {
-    res.clearCookie("token", {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-    });
+    // Optional, since token is stored in localStorage on frontend
     res.status(200).json({ message: "Logged out" });
 };
