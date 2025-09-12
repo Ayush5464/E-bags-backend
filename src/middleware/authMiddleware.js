@@ -1,17 +1,16 @@
 // middleware/authMiddleware.js
-
 import jwt from "jsonwebtoken";
 
 // Middleware to protect routes
 export const protect = (req, res, next) => {
-  const authHeader = req.headers.authorization;
+  // Check for token in header or cookie
+  let token = req.headers.authorization?.startsWith("Bearer ")
+    ? req.headers.authorization.split(" ")[1]
+    : req.cookies?.token;
 
-  // Check if Authorization header exists and starts with Bearer
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+  if (!token) {
     return res.status(401).json({ message: "Unauthorized: No token" });
   }
-
-  const token = authHeader.split(" ")[1];
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
