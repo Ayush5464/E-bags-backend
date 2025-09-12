@@ -9,7 +9,6 @@ export const createProduct = async (req, res) => {
             return res.status(400).json({ message: "At least one image is required." });
         }
 
-        // Store all uploaded image paths
         const images = req.files.map((file) => `/uploads/${file.filename}`);
 
         const product = await Product.create({
@@ -18,7 +17,7 @@ export const createProduct = async (req, res) => {
             price,
             category,
             countInStock,
-            images, // store multiple images
+            images,
         });
 
         res.status(201).json({ message: "Product created", product });
@@ -54,7 +53,6 @@ export const updateProduct = async (req, res) => {
     try {
         const updateData = { ...req.body };
 
-        // If images are uploaded, replace
         if (req.files && req.files.length > 0) {
             updateData.images = req.files.map((file) => `/uploads/${file.filename}`);
         }

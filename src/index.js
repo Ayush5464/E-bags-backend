@@ -20,7 +20,7 @@ const app = express();
 app.use(cookieParser());
 app.use(express.json());
 
-// ✅ CORS setup
+// CORS
 app.use(
     cors({
         origin: "https://e-bags-frontend.vercel.app",
@@ -28,37 +28,25 @@ app.use(
     })
 );
 
-// ✅ Serve static /uploads folder
+// Serve static /uploads folder
 const uploadsPath = path.join(path.resolve(), "uploads");
-if (!fs.existsSync(uploadsPath)) {
-    fs.mkdirSync(uploadsPath, { recursive: true });
-}
-app.use("/uploads", express.static(uploadsPath)); // <--- important!
+if (!fs.existsSync(uploadsPath)) fs.mkdirSync(uploadsPath, { recursive: true });
+app.use("/uploads", express.static(uploadsPath));
 
-// ✅ API Routes
+// API Routes
 app.use("/ebagmart/auth", userRouter);
 app.use("/ebagmart/products", productRouter);
 app.use("/ebagmart/orders", orderRouter);
 app.use("/ebagmart/cart", cartRouter);
 app.use("/ebagmart/admin", adminRouter);
 
-// Optional route check
-app.get("/ebagmart/auth", (req, res) => {
-    res.send("Auth route is working!");
-});
+// Optional test route
+app.get("/", (req, res) => res.send("Backend is running!"));
 
-app.get("/", (req, res) => {
-    res.send("Backend is running!");
-});
-
-// ✅ DB connect + server start
+// Start server
 const PORT = process.env.PORT || 5000;
 ConnectDB()
     .then(() => {
-        app.listen(PORT, () => {
-            console.log(`✅ Server running on port ${PORT}`);
-        });
+        app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));
     })
-    .catch((err) => {
-        console.error("❌ DB connection failed:", err);
-    });
+    .catch((err) => console.error("❌ DB connection failed:", err));

@@ -6,52 +6,25 @@ import {
     getAllProducts,
     getProductById,
     updateProduct,
-} from "../controlers/productControler.js"; // keep your import as-is
+} from "../controllers/productController.js";
 import multer from "multer";
-import path from "path";
-import fs from "fs";
 
-const productRoute = express.Router();
+const router = express.Router();
 
-// Multer setup: store images in 'uploads' folder
+// Multer setup for multiple images
 const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        const uploadPath = path.join(path.resolve(), "uploads");
-        if (!fs.existsSync(uploadPath)) {
-            fs.mkdirSync(uploadPath, { recursive: true });
-        }
-        cb(null, uploadPath);
-    },
-    filename: (req, file, cb) => {
-        const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-        const ext = path.extname(file.originalname);
-        cb(null, uniqueSuffix + ext);
-    },
+    destination: (req, file, cb) => cb(null, "uploads/"),
+    filename: (req, file, cb) => cb(null, Date.now() + "-" + file.originalname),
 });
-
 const upload = multer({ storage });
 
 // Public routes
-productRoute.get("/", getAllProducts);
-productRoute.get("/:id", getProductById);
+router.get("/", getAllProducts);
+router.get("/:id", getProductById);
 
-// Admin-only routes: create & update product with multiple images
-productRoute.post(
-    "/",
-    protect,
-    adminOnly,
-    upload.array("images", 5), // up to 5 images
-    createProduct
-);
+// Admin-only routes
+router.post("/", protect, adminOnly, upload.array("images", 4), createProduct);
+router.put("/:id", protect, adminOnly, upload.array("images", 4), updateProduct);
+router.delete("/:id", protect, adminOnly, deleteProduct);
 
-productRoute.put(
-    "/:id",
-    protect,
-    adminOnly,
-    upload.array("images", 5),
-    updateProduct
-);
-
-productRoute.delete("/:id", protect, adminOnly, deleteProduct);
-
-export default productRoute;
+export default router;
