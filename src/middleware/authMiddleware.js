@@ -1,27 +1,26 @@
 // middleware/authMiddleware.js
 import jwt from "jsonwebtoken";
 
-// Middleware to protect routes
+// Protect routes
 export const protect = (req, res, next) => {
-  // Check for token in header or cookie
-  let token = req.headers.authorization?.startsWith("Bearer ")
-    ? req.headers.authorization.split(" ")[1]
-    : req.cookies?.token;
+  const authHeader = req.headers.authorization;
 
-  if (!token) {
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
     return res.status(401).json({ message: "Unauthorized: No token" });
   }
 
+  const token = authHeader.split(" ")[1];
+
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded; // Add decoded user to req object
+    req.user = decoded; // Add decoded user to request
     next();
   } catch (err) {
     return res.status(401).json({ message: "Invalid token" });
   }
 };
 
-// Middleware for admin-only routes
+// Admin-only routes
 export const adminOnly = (req, res, next) => {
   if (!req.user?.isAdmin) {
     return res.status(403).json({ message: "Admins only" });
