@@ -2,63 +2,63 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 dotenv.config();
+
 import ConnectDB from "./config/db.js";
 import userRouter from "./routes/userRoutes.js";
 import productRouter from "./routes/productRouter.js";
 import orderRouter from "./routes/orderRouter.js";
 import cartRouter from "./routes/cartRouter.js";
 import adminRouter from "./routes/adminRouter.js";
+
 import cookieParser from "cookie-parser";
 import path from "path";
 import fs from "fs";
 
 const app = express();
 
-// Middleware
+// Middlewares
 app.use(cookieParser());
 app.use(express.json());
 
+// ✅ CORS setup
 app.use(
     cors({
-        origin: "https://e-bags-frontend.vercel.app", // Allow your frontend domain
-        credentials: true, // Allow cookies
+        origin: "https://e-bags-frontend.vercel.app",
+        credentials: true,
     })
 );
 
-// Ensure uploads folder exists
+// ✅ Serve static /uploads folder
 const uploadsPath = path.join(path.resolve(), "uploads");
 if (!fs.existsSync(uploadsPath)) {
     fs.mkdirSync(uploadsPath, { recursive: true });
 }
+app.use("/uploads", express.static(uploadsPath)); // <--- important!
 
-// Serve static uploads
-app.use("/uploads", express.static(uploadsPath));
-
-// Routes
+// ✅ API Routes
 app.use("/ebagmart/auth", userRouter);
 app.use("/ebagmart/products", productRouter);
 app.use("/ebagmart/orders", orderRouter);
 app.use("/ebagmart/cart", cartRouter);
 app.use("/ebagmart/admin", adminRouter);
 
-// Optional GET route for auth testing
+// Optional route check
 app.get("/ebagmart/auth", (req, res) => {
-    res.send("Auth route is working! Use POST /login or /register");
+    res.send("Auth route is working!");
 });
 
-// Default route
 app.get("/", (req, res) => {
     res.send("Backend is running!");
 });
 
-// Connect to DB and start server
+// ✅ DB connect + server start
 const PORT = process.env.PORT || 5000;
 ConnectDB()
     .then(() => {
         app.listen(PORT, () => {
-            console.log(`Server running on port ${PORT}`);
+            console.log(`✅ Server running on port ${PORT}`);
         });
     })
     .catch((err) => {
-        console.error("DB connection failed:", err);
+        console.error("❌ DB connection failed:", err);
     });
