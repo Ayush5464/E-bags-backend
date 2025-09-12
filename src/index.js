@@ -20,16 +20,11 @@ const app = express();
 app.use(cookieParser());
 app.use(express.json());
 
-// ✅ CORS setup for all Vercel preview URLs + localhost
+// ✅ CORS setup
 app.use(
     cors({
-        origin: (origin, callback) => {
-            if (!origin) return callback(null, true); // allow Postman/curl
-            if (/\.vercel\.app$/.test(origin)) return callback(null, true); // allow any Vercel frontend
-            if (/localhost/.test(origin)) return callback(null, true); // allow localhost dev
-            return callback(new Error("Not allowed by CORS"));
-        },
-        credentials: true, // allow cookies
+        origin: "https://e-bags-frontend.vercel.app",
+        credentials: true,
     })
 );
 
@@ -38,7 +33,7 @@ const uploadsPath = path.join(path.resolve(), "uploads");
 if (!fs.existsSync(uploadsPath)) {
     fs.mkdirSync(uploadsPath, { recursive: true });
 }
-app.use("/uploads", express.static(uploadsPath));
+app.use("/uploads", express.static(uploadsPath)); // <--- important!
 
 // ✅ API Routes
 app.use("/ebagmart/auth", userRouter);
