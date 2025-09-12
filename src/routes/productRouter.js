@@ -1,15 +1,9 @@
 import express from "express";
 import { protect, adminOnly } from "../middleware/authMiddleware.js";
-import {
-    createProduct,
-    deleteProduct,
-    getAllProducts,
-    getProductById,
-    updateProduct,
-} from "../controllers/productController.js";
 import multer from "multer";
+import { createProduct, getAllProducts, getProductById, updateProduct } from "../controlers/productControler.js";
 
-const router = express.Router();
+const productRouter = express.Router();
 
 // Multer setup for multiple images
 const storage = multer.diskStorage({
@@ -19,12 +13,12 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 // Public routes
-router.get("/", getAllProducts);
-router.get("/:id", getProductById);
+productRouter.get("/", getAllProducts);
+productRouter.get("/:id", getProductById);
 
 // Admin-only routes
-router.post("/", protect, adminOnly, upload.array("images", 4), createProduct);
-router.put("/:id", protect, adminOnly, upload.array("images", 4), updateProduct);
-router.delete("/:id", protect, adminOnly, deleteProduct);
+productRouter.post("/", protect, adminOnly, upload.array("images", 4), createProduct);
+productRouter.put("/:id", protect, adminOnly, upload.array("images", 4), updateProduct);
+productRouter.delete("/:id", protect, adminOnly, deleteProduct);
 
-export default router;
+export default productRouter;
