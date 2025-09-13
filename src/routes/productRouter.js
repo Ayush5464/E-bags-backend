@@ -8,8 +8,12 @@ const productRouter = express.Router();
 // Multer setup for multiple images
 const storage = multer.diskStorage({
     destination: (req, file, cb) => cb(null, "uploads/"),
-    filename: (req, file, cb) => cb(null, Date.now() + "-" + file.originalname),
+    filename: (req, file, cb) => {
+        const sanitizedFilename = file.originalname.replace(/\s+/g, "-"); // ✅ remove spaces
+        cb(null, Date.now() + "-" + sanitizedFilename);
+    },
 });
+
 const upload = multer({ storage });
 
 // Public routes
