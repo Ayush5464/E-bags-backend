@@ -1,5 +1,5 @@
 // controlers/productControler.js
-import Product from "../models/productModel,js";
+import Product from "../models/productModel.js"
 
 // Create product
 export const createProduct = async (req, res) => {
