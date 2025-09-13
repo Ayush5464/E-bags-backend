@@ -1,7 +1,9 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-dotenv.config();
+import cookieParser from "cookie-parser";
+import path from "path";
+import fs from "fs";
 
 import ConnectDB from "./config/db.js";
 import userRouter from "./routes/userRoutes.js";
@@ -10,9 +12,7 @@ import orderRouter from "./routes/orderRouter.js";
 import cartRouter from "./routes/cartRouter.js";
 import adminRouter from "./routes/adminRouter.js";
 
-import cookieParser from "cookie-parser";
-import path from "path";
-import fs from "fs";
+dotenv.config();
 
 const app = express();
 
@@ -28,21 +28,23 @@ app.use(
     })
 );
 
-// Serve static /uploads folder
+// Ensure uploads folder exists
+const uploadPath = path.resolve("uploads");
+if (!fs.existsSync(uploadPath)) {
+    fs.mkdirSync(uploadPath, { recursive: true });
+}
 
-const uploadsPath = path.join(path.resolve(), "uploads");
-if (!fs.existsSync(uploadsPath)) fs.mkdirSync(uploadsPath, { recursive: true });
-app.use("/uploads", express.static(path.join(path.resolve(), "uploads")));
+// Serve uploads folder statically
+app.use("/uploads", express.static(uploadPath));
 
-
-// API Routes
+// API routes
 app.use("/ebagmart/auth", userRouter);
 app.use("/ebagmart/products", productRouter);
 app.use("/ebagmart/orders", orderRouter);
 app.use("/ebagmart/cart", cartRouter);
 app.use("/ebagmart/admin", adminRouter);
 
-// Optional test route
+// Test route
 app.get("/", (req, res) => res.send("Backend is running!"));
 
 // Start server
