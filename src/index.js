@@ -29,9 +29,11 @@ app.use(
 );
 
 // Serve static /uploads folder
+
 const uploadsPath = path.join(path.resolve(), "uploads");
 if (!fs.existsSync(uploadsPath)) fs.mkdirSync(uploadsPath, { recursive: true });
-app.use("/uploads", express.static(uploadsPath));
+app.use("/uploads", express.static(path.join(path.resolve(), "uploads")));
+
 
 // API Routes
 app.use("/ebagmart/auth", userRouter);
