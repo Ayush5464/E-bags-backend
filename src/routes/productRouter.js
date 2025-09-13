@@ -9,8 +9,12 @@ const productRouter = express.Router();
 const storage = multer.diskStorage({
     destination: (req, file, cb) => cb(null, "uploads/"),
     filename: (req, file, cb) => {
-        const sanitizedFilename = file.originalname.replace(/\s+/g, "-"); // ✅ remove spaces
-        cb(null, Date.now() + "-" + sanitizedFilename);
+        const cleanName = file.originalname
+            .toLowerCase()
+            .replace(/\s+/g, "-")         // Replace spaces with dashes
+            .replace(/[^\w.-]/g, "");     // Remove unsafe characters
+
+        cb(null, Date.now() + "-" + cleanName);
     },
 });
 
