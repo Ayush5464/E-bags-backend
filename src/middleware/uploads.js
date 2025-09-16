@@ -1,6 +1,14 @@
-import multer from "multer";
-import { storage } from "../config/cloudinary.js";
+import multer from "multer"
 
-const upload = multer({ storage });
 
-export default upload;
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, "../uploads")
+    },
+    filename: (req, file, cb) => {
+        const uniqueName = Date.now() + "-" + Math.round(Math.random() * 1E9)
+        cb(null, file.originalname + "-" + uniqueName)
+    }
+})
+
+export const upload = multer({ storage, })

@@ -11,6 +11,7 @@ import productRouter from "./routes/productRouter.js";
 import orderRouter from "./routes/orderRouter.js";
 import cartRouter from "./routes/cartRouter.js";
 import adminRouter from "./routes/adminRouter.js";
+import { upload } from "./middleware/uploads.js";
 
 dotenv.config();
 
@@ -29,13 +30,13 @@ app.use(
 );
 
 // Ensure uploads folder exists
-const uploadPath = path.resolve("uploads");
-if (!fs.existsSync(uploadPath)) {
-    fs.mkdirSync(uploadPath, { recursive: true });
-}
+// const uploadPath = path.resolve("uploads");
+// if (!fs.existsSync(uploadPath)) {
+//     fs.mkdirSync(uploadPath, { recursive: true });
+// }
 
 // Serve uploads folder statically
-app.use("/uploads", express.static(uploadPath));
+app.use("/uploads", express.static(upload));
 
 // API routes
 app.use("/ebagmart/auth", userRouter);

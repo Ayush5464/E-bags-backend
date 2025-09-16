@@ -1,10 +1,16 @@
+import { uploadOnCloudinary } from "../middleware/cloudinary.js";
 import Product from "../models/productModel.js";
 
 // Create product
 export const createProduct = async (req, res) => {
     try {
         const { name, description, price, category, countInStock } = req.body;
-        const images = req.files.map((file) => `/uploads/${file.filename}`);
+        const imageLocalPath = req.files.map((file) => file.path);
+
+        if (!imageLocalPath) return res.status(400).json("upload the image")
+
+        const imageUpload = await uploadOnCloudinary(imageLocalPath)
+        if (!imageUpload) return res.status(400).json("upload the image")
 
         const product = await Product.create({
             name,
@@ -12,7 +18,7 @@ export const createProduct = async (req, res) => {
             price,
             category,
             countInStock,
-            images,
+            images: imageUpload.url,
         });
 
         res.status(201).json(product);
