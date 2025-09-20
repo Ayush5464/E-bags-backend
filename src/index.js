@@ -29,13 +29,12 @@ app.use(
     })
 );
 
-// Ensure uploads folder exists
-// const uploadPath = path.resolve("uploads");
-// if (!fs.existsSync(uploadPath)) {
-//     fs.mkdirSync(uploadPath, { recursive: true });
-// }
+const uploadPath = path.resolve("uploads");
+if (!fs.existsSync(uploadPath)) {
+    fs.mkdirSync(uploadPath, { recursive: true });
+}
 
-// Serve uploads folder statically
+Serve uploads folder statically
 app.use("/uploads", express.static(upload));
 
 // API routes
